@@ -1,6 +1,6 @@
 package me.morpheus.lighteconomy.util.hacks;
 
-public class Reference2ObjectOpenHacksMap<K, V> extends Reference2ObjectOpenHashMap<K, V> {
+public final class Reference2ObjectOpenHacksMap<K, V> extends Reference2ObjectOpenHashMap<K, V> {
 
     public Reference2ObjectOpenHacksMap(final int expected) {
         super(expected);

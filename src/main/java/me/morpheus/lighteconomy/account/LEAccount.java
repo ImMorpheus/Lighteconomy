@@ -51,17 +51,17 @@ public class LEAccount implements Account {
     }
 
     @Override
-    public BigDecimal getDefaultBalance(Currency currency) {
+    public final BigDecimal getDefaultBalance(Currency currency) {
         return ((LECurrency) currency).getDefaultBalance();
     }
 
     @Override
-    public boolean hasBalance(Currency currency, Set<Context> contexts) {
+    public final boolean hasBalance(Currency currency, Set<Context> contexts) {
         return this.balances.containsKey(currency);
     }
 
     @Override
-    public BigDecimal getBalance(Currency currency, Set<Context> contexts) {
+    public final BigDecimal getBalance(Currency currency, Set<Context> contexts) {
         final BigDecimal bal = this.balances.get(currency);
         if (bal == null) {
             return BigDecimal.ZERO;
@@ -70,12 +70,12 @@ public class LEAccount implements Account {
     }
 
     @Override
-    public Map<Currency, BigDecimal> getBalances(Set<Context> contexts) {
+    public final Map<Currency, BigDecimal> getBalances(Set<Context> contexts) {
         return Collections.unmodifiableMap(this.balances);
     }
 
     @Override
-    public TransactionResult setBalance(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
+    public final TransactionResult setBalance(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
         requirePositive(amount);
         final BigDecimal max = ((LECurrency) currency).getMaxBalance();
         if (max.compareTo(amount) < 0) {
@@ -106,7 +106,7 @@ public class LEAccount implements Account {
     }
 
     @Override
-    public Map<Currency, TransactionResult> resetBalances(Cause cause, Set<Context> contexts) {
+    public final Map<Currency, TransactionResult> resetBalances(Cause cause, Set<Context> contexts) {
         final Map<Currency, TransactionResult> map = new IdentityHashMap<>(this.balances.size());
         this.balances.replaceAll((currency, current) -> {
             final BigDecimal amount = getDefaultBalance(currency);
@@ -128,13 +128,13 @@ public class LEAccount implements Account {
     }
 
     @Override
-    public TransactionResult resetBalance(Currency currency, Cause cause, Set<Context> contexts) {
+    public final TransactionResult resetBalance(Currency currency, Cause cause, Set<Context> contexts) {
         final BigDecimal amount = getDefaultBalance(currency);
         return setBalance(currency, amount, cause, contexts);
     }
 
     @Override
-    public TransactionResult deposit(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
+    public final TransactionResult deposit(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
         requirePositive(amount);
         final boolean[] deposit = {true};
         this.balances.merge(currency, amount, (current, v) -> {
@@ -172,7 +172,7 @@ public class LEAccount implements Account {
     }
 
     @Override
-    public TransactionResult withdraw(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
+    public final TransactionResult withdraw(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
         requirePositive(amount);
         final boolean[] withdraw = {true};
         final BigDecimal after = this.balances.computeIfPresent(currency, (k, old) -> {
@@ -208,7 +208,7 @@ public class LEAccount implements Account {
     }
 
     @Override
-    public TransferResult transfer(Account to, Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
+    public final TransferResult transfer(Account to, Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
         requirePositive(amount);
         final boolean[] withdraw = {true};
         final BigDecimal after = this.balances.computeIfPresent(currency, (k, old) -> {
