@@ -64,7 +64,7 @@ public class LEAccount implements Account {
     public final BigDecimal getBalance(Currency currency, Set<Context> contexts) {
         final BigDecimal bal = this.balances.get(currency);
         if (bal == null) {
-            return BigDecimal.ZERO;
+            return getDefaultBalance(currency);
         }
         return bal;
     }
