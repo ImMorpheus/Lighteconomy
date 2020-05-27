@@ -32,6 +32,7 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
+import org.spongepowered.api.service.economy.account.AccountDeletionResultType;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.ResultType;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
@@ -148,6 +149,7 @@ public class LightEconomy {
         Sponge.getCommandManager().register(this.container, baltop(), "baltop");
         Sponge.getCommandManager().register(this.container, pay(), "pay");
         Sponge.getCommandManager().register(this.container, setbal(), "setbal");
+        Sponge.getCommandManager().register(this.container, delbal(), "delbal");
     }
 
     private CommandSpec bal() {
@@ -294,6 +296,25 @@ public class LightEconomy {
                     final Text formatted = currency.format(amount);
                     src.sendMessage(TextUtil.watermark(TextColors.GREEN, NameUtil.getDisplayName(target), "'s balance set to ", formatted));
                     target.getPlayer().ifPresent(p -> p.sendMessage(TextUtil.watermark(TextColors.GREEN, "Your balance has been set to ", formatted)));
+                    return CommandResult.success();
+                })
+                .build();
+    }
+
+    private CommandSpec delbal() {
+        return CommandSpec.builder()
+                .arguments(GenericArguments.onlyOne(GenericArguments.user(Text.of("user"))))
+                .permission(LightEconomy.PERM + ".delbalance.base")
+                .executor((src, args) -> {
+                    final EconomyService es = Sponge.getServiceManager().provideUnchecked(EconomyService.class);
+                    final User target = args.requireOne("user");
+                    final AccountDeletionResultType result = es.deleteAccount(target.getUniqueId());
+                    if (!result.isSuccess()) {
+                        src.sendMessage(TextUtil.watermark(TextColors.RED, "Unable to delete account ", result.getName()));
+                        return CommandResult.empty();
+                    }
+                    src.sendMessage(TextUtil.watermark(TextColors.GREEN, NameUtil.getDisplayName(target), "'s account has been deleted"));
+                    target.getPlayer().ifPresent(p -> p.sendMessage(TextUtil.watermark(TextColors.GREEN, "Your balance has been deleted ")));
                     return CommandResult.success();
                 })
                 .build();
