@@ -30,7 +30,7 @@ import java.util.UUID;
 public class LEAccount implements Account {
 
     @Nullable protected Text displayName;
-    private final Map<Currency, BigDecimal> balances;
+    private final Reference2ObjectOpenHacksMap<Currency, BigDecimal> balances;
     private final String identifier;
     private boolean dirty = false;
 
@@ -318,7 +318,7 @@ public class LEAccount implements Account {
     public static final class AccountBuilder {
 
         @Nullable private Text displayName;
-        private final Map<Currency, BigDecimal> balances;
+        private final Reference2ObjectOpenHacksMap<Currency, BigDecimal> balances;
         @Nullable private String identifier;
         @Nullable UUID uniqueId;
 
