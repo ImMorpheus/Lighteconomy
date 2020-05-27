@@ -78,7 +78,7 @@ public class LEAccount implements Account {
     public final TransactionResult setBalance(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
         requirePositive(amount);
         final BigDecimal max = ((LECurrency) currency).getMaxBalance();
-        if (max.compareTo(amount) < 0) {
+        if (max != null && max.compareTo(amount) < 0) {
             final TransactionResult result = LETransactionResult.builder()
                     .account(this)
                     .amount(amount)
@@ -139,11 +139,13 @@ public class LEAccount implements Account {
         final BigDecimal deposit = this.balances.computeIfNotEqual(currency,
                 (k) -> {
                     final BigDecimal sum = getDefaultBalance(k).add(amount);
-                    return ((LECurrency) k).getMaxBalance().compareTo(sum) < 0 ? null : sum;
+                    final BigDecimal max = ((LECurrency) currency).getMaxBalance();
+                    return max != null && max.compareTo(sum) < 0 ? null : sum;
                 },
                 (k, v) -> {
                     final BigDecimal sum = v.add(amount);
-                    return ((LECurrency) k).getMaxBalance().compareTo(sum) < 0 ? v : sum;
+                    final BigDecimal max = ((LECurrency) currency).getMaxBalance();
+                    return max != null && max.compareTo(sum) < 0 ? v : sum;
                 }
         );
         if (deposit == null) {
@@ -233,11 +235,13 @@ public class LEAccount implements Account {
         final BigDecimal deposit = ((LEAccount) to).balances.computeIfNotEqual(currency,
                 (k) -> {
                     final BigDecimal sum = getDefaultBalance(k).add(amount);
-                    return ((LECurrency) k).getMaxBalance().compareTo(sum) < 0 ? null : sum;
+                    final BigDecimal max = ((LECurrency) currency).getMaxBalance();
+                    return max != null && max.compareTo(sum) < 0 ? null : sum;
                 },
                 (k, v) -> {
                     final BigDecimal sum = v.add(amount);
-                    return ((LECurrency) k).getMaxBalance().compareTo(sum) < 0 ? v : sum;
+                    final BigDecimal max = ((LECurrency) currency).getMaxBalance();
+                    return max != null && max.compareTo(sum) < 0 ? v : sum;
                 }
         );
         if (deposit == null) {

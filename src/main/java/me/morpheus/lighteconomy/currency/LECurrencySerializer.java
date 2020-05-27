@@ -41,7 +41,11 @@ public final class LECurrencySerializer implements TypeSerializer<LECurrency> {
         value.getNode("displayName").setValue(TypeTokens.TEXT_TOKEN, obj.getDisplayName());
         value.getNode("pluralDisplayName").setValue(TypeTokens.TEXT_TOKEN, obj.getPluralDisplayName());
         value.getNode("symbol").setValue(TypeTokens.TEXT_TOKEN, obj.getSymbol());
-        value.getNode("maxBalance").setValue(obj.getMaxBalance().setScale(obj.getDefaultFractionDigits(), RoundingMode.HALF_UP).doubleValue());
+        if (obj.getMaxBalance() == null) {
+            value.getNode("maxBalance").setValue(-1);
+        } else {
+            value.getNode("maxBalance").setValue(obj.getMaxBalance().setScale(obj.getDefaultFractionDigits(), RoundingMode.HALF_UP).doubleValue());
+        }
         value.getNode("defaultBalance").setValue(obj.getDefaultBalance().setScale(obj.getDefaultFractionDigits(), RoundingMode.HALF_UP).doubleValue());
         value.getNode("defaultFractionDigits").setValue(obj.getDefaultFractionDigits());
         value.getNode("isDefault").setValue(obj.isDefault());
