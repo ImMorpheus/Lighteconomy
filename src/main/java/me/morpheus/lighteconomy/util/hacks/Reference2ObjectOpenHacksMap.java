@@ -30,6 +30,32 @@ public final class Reference2ObjectOpenHacksMap<K, V> extends Reference2ObjectOp
         return this.value[pos] = newValue;
     }
 
+    public V computeIfNotEqual(final K k,
+                              final java.util.function.Function<? super K, ? extends V> defFunction,
+                              final java.util.function.BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+        final int pos = find(k);
+        if (pos < 0) {
+            final V sup = defFunction.apply(k);
+            if (sup != null) {
+                insert(-pos - 1, k, sup);
+                return sup;
+            }
+            return this.defRetValue;
+        }
+        final V newValue = remappingFunction.apply((k), this.value[pos]);
+        if (newValue == this.value[pos]) {
+            return this.defRetValue;
+        }
+        if (newValue == null) {
+            if (((k) == (null)))
+                removeNullEntry();
+            else
+                removeEntry(pos);
+            return this.defRetValue;
+        }
+        return this.value[pos] = newValue;
+    }
+
     @Override
     public V computeIfPresent(final K k,
                                    final java.util.function.BiFunction<? super K, ? super V, ? extends V> remappingFunction) {

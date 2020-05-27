@@ -136,17 +136,17 @@ public class LEAccount implements Account {
     @Override
     public final TransactionResult deposit(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
         requirePositive(amount);
-        final boolean[] deposit = {true};
-        this.balances.merge(currency, amount, (current, v) -> {
-            final BigDecimal max = ((LECurrency) currency).getMaxBalance();
-            final BigDecimal sum = current.add(v);
-            if (max.compareTo(sum) < 0) {
-                deposit[0] = false;
-                return current;
-            }
-            return sum;
-        });
-        if (!deposit[0]) {
+        final BigDecimal deposit = this.balances.computeIfNotEqual(currency,
+                (k) -> {
+                    final BigDecimal sum = getDefaultBalance(k).add(amount);
+                    return ((LECurrency) k).getMaxBalance().compareTo(sum) < 0 ? null : sum;
+                },
+                (k, v) -> {
+                    final BigDecimal sum = v.add(amount);
+                    return ((LECurrency) k).getMaxBalance().compareTo(sum) < 0 ? v : sum;
+                }
+        );
+        if (deposit == null) {
             final TransactionResult result = LETransactionResult.builder()
                     .account(this)
                     .amount(amount)
@@ -174,15 +174,14 @@ public class LEAccount implements Account {
     @Override
     public final TransactionResult withdraw(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
         requirePositive(amount);
-        final boolean[] withdraw = {true};
-        final BigDecimal after = this.balances.computeIfPresent(currency, (k, old) -> {
-            if (old.compareTo(amount) < 0) {
-                withdraw[0] = false;
-                return old;
-            }
-            return old.subtract(amount);
-        });
-        if (after == null || !withdraw[0]) {
+        final BigDecimal withdraw = this.balances.computeIfNotEqual(currency,
+                (k) -> {
+                    final BigDecimal def = getDefaultBalance(k);
+                    return def.compareTo(amount) < 0 ? null : def.subtract(amount);
+                },
+                (k, v) -> v.compareTo(amount) < 0 ? v : v.subtract(amount)
+        );
+        if (withdraw == null) {
             final TransactionResult result = LETransactionResult.builder()
                     .account(this)
                     .amount(amount)
@@ -210,15 +209,14 @@ public class LEAccount implements Account {
     @Override
     public final TransferResult transfer(Account to, Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
         requirePositive(amount);
-        final boolean[] withdraw = {true};
-        final BigDecimal after = this.balances.computeIfPresent(currency, (k, old) -> {
-            if (old.compareTo(amount) < 0) {
-                withdraw[0] = false;
-                return old;
-            }
-            return old.subtract(amount);
-        });
-        if (after == null || !withdraw[0]) {
+        final BigDecimal withdraw = this.balances.computeIfNotEqual(currency,
+                (k) -> {
+                    final BigDecimal def = getDefaultBalance(k);
+                    return def.compareTo(amount) < 0 ? null : def.subtract(amount);
+                },
+                (k, v) -> v.compareTo(amount) < 0 ? v : v.subtract(amount)
+        );
+        if (withdraw == null) {
             final TransferResult result = (TransferResult) LETransactionResult.builder()
                     .account(this)
                     .accountTo(to)
@@ -232,17 +230,17 @@ public class LEAccount implements Account {
             return result;
         }
         setDirty(true);
-        final boolean[] deposit = {true};
-        ((LEAccount) to).balances.merge(currency, amount, (current, v) -> {
-            final BigDecimal max = ((LECurrency) currency).getMaxBalance();
-            final BigDecimal sum = current.add(v);
-            if (max.compareTo(sum) < 0) {
-                deposit[0] = false;
-                return current;
-            }
-            return sum;
-        });
-        if (!deposit[0]) {
+        final BigDecimal deposit = ((LEAccount) to).balances.computeIfNotEqual(currency,
+                (k) -> {
+                    final BigDecimal sum = getDefaultBalance(k).add(amount);
+                    return ((LECurrency) k).getMaxBalance().compareTo(sum) < 0 ? null : sum;
+                },
+                (k, v) -> {
+                    final BigDecimal sum = v.add(amount);
+                    return ((LECurrency) k).getMaxBalance().compareTo(sum) < 0 ? v : sum;
+                }
+        );
+        if (deposit == null) {
             //revert withdraw
             this.balances.merge(currency, amount, BigDecimal::add);
             final TransferResult result = (TransferResult) LETransactionResult.builder()
