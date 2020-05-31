@@ -42,6 +42,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -119,23 +120,22 @@ public class LightEconomy {
 
     private void initEconomyService() {
         final EconomyService es = Sponge.getServiceManager().provideUnchecked(EconomyService.class);
+        final Collection<Currency> currencies = Sponge.getRegistry().getAllOf(Currency.class);
         Currency def = null;
-        int count = 0;
-        for (Currency currency : Sponge.getRegistry().getAllOf(Currency.class)) {
+        for (Currency currency : currencies) {
             if (currency.isDefault()) {
                 if (def != null) {
                     throw new IllegalStateException("Multiple default currencies: (" + def.getId() + ") and (" + currency.getId() + ")");
                 }
                 def = currency;
             }
-            count++;
         }
         if (def == null) {
             throw new IllegalStateException("Missing default currency");
         }
         ((LightEconomyService) es).setDefaultCurrency(def);
-        ((LightEconomyService) es).setCurrencies(count);
-        ((LEAccountSerializer) TypeSerializers.getDefaultSerializers().get(LETypeTokens.ACCOUNT_TOKEN)).setSize(count);
+        ((LightEconomyService) es).setCurrencies(currencies.size());
+        ((LEAccountSerializer) TypeSerializers.getDefaultSerializers().get(LETypeTokens.ACCOUNT_TOKEN)).setSize(currencies.size());
     }
 
     private void registerConfigService() throws IOException, ObjectMappingException {
