@@ -215,11 +215,9 @@ public class LightEconomy {
     private CommandSpec pay() {
         return CommandSpec.builder()
                 .arguments(
-                        GenericArguments.seq(
-                                GenericArguments.bigDecimal(Text.of("amount")),
-                                GenericArguments.optionalWeak(GenericArguments.onlyOne(GenericArguments.catalogedElement(Text.of("currency"), Currency.class))),
-                                GenericArguments.onlyOne(GenericArguments.user(Text.of("user")))
-                        )
+                        GenericArguments.bigDecimal(Text.of("amount")),
+                        GenericArguments.optionalWeak(GenericArguments.onlyOne(GenericArguments.catalogedElement(Text.of("currency"), Currency.class))),
+                        GenericArguments.onlyOne(GenericArguments.user(Text.of("user")))
                 )
                 .permission(LightEconomy.PERM + ".pay.base")
                 .executor((src, args) -> {
@@ -264,11 +262,9 @@ public class LightEconomy {
     private CommandSpec setbal() {
         return CommandSpec.builder()
                 .arguments(
-                        GenericArguments.seq(
-                                GenericArguments.bigDecimal(Text.of("amount")),
-                                GenericArguments.optionalWeak(GenericArguments.onlyOne(GenericArguments.catalogedElement(Text.of("currency"), Currency.class))),
-                                GenericArguments.onlyOne(GenericArguments.user(Text.of("user")))
-                        )
+                        GenericArguments.bigDecimal(Text.of("amount")),
+                        GenericArguments.optionalWeak(GenericArguments.onlyOne(GenericArguments.catalogedElement(Text.of("currency"), Currency.class))),
+                        GenericArguments.onlyOne(GenericArguments.user(Text.of("user")))
                 )
                 .permission(LightEconomy.PERM + ".setbalance.base")
                 .executor((src, args) -> {
