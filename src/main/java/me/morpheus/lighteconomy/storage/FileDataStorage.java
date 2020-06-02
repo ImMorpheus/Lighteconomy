@@ -53,8 +53,9 @@ public final class FileDataStorage implements DataStorageService {
                 final LEAccount account = node.getValue(LETypeTokens.ACCOUNT_TOKEN);
                 if (account == null) {
                     LELog.getLogger().error("Unable to read Account from {}", acc);
+                } else {
+                    list.add(account);
                 }
-                list.add(account);
             }
         } catch (Exception e) {
             LELog.getLogger().error("Error while reading accounts from {}", dir);
