@@ -19,6 +19,9 @@ public final class Reference2ObjectOpenHacksMap<K, V> extends Reference2ObjectOp
             insert(-pos - 1, k, v);
             return v;
         }
+        if (this.value[pos] == null) {
+            return this.value[pos] = v;
+        }
         final V newValue = remappingFunction.apply(this.value[pos], v);
         if (newValue == null) {
             if (((k) == (null)))
@@ -61,7 +64,7 @@ public final class Reference2ObjectOpenHacksMap<K, V> extends Reference2ObjectOp
                                    final java.util.function.BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
         java.util.Objects.requireNonNull(remappingFunction);
         final int pos = find(k);
-        if (pos < 0)
+        if (pos < 0 || this.value[pos] == null)
             return this.defRetValue;
         final V newValue = remappingFunction.apply((k), this.value[pos]);
         if (newValue == null) {
