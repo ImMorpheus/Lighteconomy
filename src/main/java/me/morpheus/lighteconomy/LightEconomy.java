@@ -3,6 +3,7 @@ package me.morpheus.lighteconomy;
 import com.google.inject.Inject;
 import me.morpheus.lighteconomy.account.LEAccount;
 import me.morpheus.lighteconomy.account.LEAccountSerializer;
+import me.morpheus.lighteconomy.config.ConfigUtil;
 import me.morpheus.lighteconomy.config.Global;
 import me.morpheus.lighteconomy.config.SimpleConfigService;
 import me.morpheus.lighteconomy.currency.CurrencyLoader;
@@ -65,7 +66,7 @@ public class LightEconomy {
         TypeSerializers.getDefaultSerializers().registerType(LETypeTokens.ACCOUNT_TOKEN, new LEAccountSerializer());
 
         Sponge.getRegistry().registerModule(Currency.class, new CurrencyRegistryModule());
-        Sponge.getServiceManager().setProvider(this.container, DataStorageService.class, new FileDataStorage());
+        Sponge.getServiceManager().setProvider(this.container, DataStorageService.class, new FileDataStorage(ConfigUtil.ROOT));
         final DataStorageService dss = Sponge.getServiceManager().provideUnchecked(DataStorageService.class);
         Sponge.getServiceManager().setProvider(this.container, EconomyService.class, new LightEconomyService(dss));
         try {
@@ -87,30 +88,34 @@ public class LightEconomy {
     public void onPostInit(GamePostInitializationEvent event) {
         LELog.getLogger().info("Loading config");
         final EconomyService es = Sponge.getServiceManager().provideUnchecked(EconomyService.class);
-        ((LightEconomyService) es).populate();
+        try {
+            ((LightEconomyService) es).populate();
+        } catch (Exception e) {
+            LELog.getLogger().error("Failed to populate the economy service");
+            LELog.getLogger().error("Error", e);
+        }
     }
 
     @Listener
     public void onServerStopping(GameStoppingServerEvent event) {
+        LELog.getLogger().info("Saving...");
         CurrencyLoader.getInstance().save();
-        final EconomyService es = Sponge.getServiceManager().provideUnchecked(EconomyService.class);
-        LELog.getLogger().info("Saving virtual accounts");
-        ((LightEconomyService) es).getVirtualAccounts().forEach(acc -> {
-            if (((LEAccount) acc).isDirty()) {
-                ((LightEconomyService) es).getStorage().save(acc);
-            }
-        });
-        LELog.getLogger().info("Saving unique accounts");
-        ((LightEconomyService) es).getUniqueAccounts().forEach(acc -> {
-            if (((LEAccount) acc).isDirty()) {
-                ((LightEconomyService) es).getStorage().save(acc);
-            }
-        });
-        LELog.getLogger().info("Saving config");
-        final SimpleConfigService cs = Sponge.getServiceManager().provideUnchecked(SimpleConfigService.class);
-        cs.save();
+        final LightEconomyService es = (LightEconomyService) Sponge.getServiceManager().provideUnchecked(EconomyService.class);
+        es.getVirtualAccounts().forEach(acc -> save(es, (LEAccount) acc));
+        es.getUniqueAccounts().forEach(acc -> save(es, (LEAccount) acc));
+        Sponge.getServiceManager().provideUnchecked(SimpleConfigService.class).save();
     }
 
+    private void save(LightEconomyService es, LEAccount account) {
+        if (account.isDirty()) {
+            try {
+                es.getStorage().save(account);
+            } catch (Exception e) {
+                LELog.getLogger().error("Failed to save account {}", account.getIdentifier());
+                LELog.getLogger().error("Error", e);
+            }
+        }
+    }
     @Listener
     public void onReload(GameReloadEvent event) {
         final SimpleConfigService cs = Sponge.getServiceManager().provideUnchecked(SimpleConfigService.class);
@@ -119,7 +124,6 @@ public class LightEconomy {
     }
 
     private void initEconomyService() {
-        final EconomyService es = Sponge.getServiceManager().provideUnchecked(EconomyService.class);
         final Collection<Currency> currencies = Sponge.getRegistry().getAllOf(Currency.class);
         Currency def = null;
         for (Currency currency : currencies) {
@@ -133,6 +137,7 @@ public class LightEconomy {
         if (def == null) {
             throw new IllegalStateException("Missing default currency");
         }
+        final EconomyService es = Sponge.getServiceManager().provideUnchecked(EconomyService.class);
         ((LightEconomyService) es).setDefaultCurrency(def);
         ((LightEconomyService) es).setCurrencies(currencies.size());
         ((LEAccountSerializer) TypeSerializers.getDefaultSerializers().get(LETypeTokens.ACCOUNT_TOKEN)).setSize(currencies.size());

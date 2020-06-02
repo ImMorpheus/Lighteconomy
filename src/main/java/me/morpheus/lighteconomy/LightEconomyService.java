@@ -15,6 +15,7 @@ import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.account.VirtualAccount;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -96,11 +97,15 @@ public final class LightEconomyService implements EconomyService {
         if (acc == null) {
             return AccountDeletionResultTypes.ABSENT;
         }
-        final boolean success = this.storage.delete(acc);
-        if (!success) {
-            return AccountDeletionResultTypes.FAILED;
+        try {
+            if (this.storage.delete(acc)) {
+                return AccountDeletionResultTypes.SUCCESS;
+            }
+        } catch (Exception e) {
+            LELog.getLogger().error("Failed to deleted Account {} with {}", acc.getIdentifier(), uuid);
+            LELog.getLogger().error("Error", e);
         }
-        return AccountDeletionResultTypes.SUCCESS;
+        return AccountDeletionResultTypes.FAILED;
     }
 
     @Override
@@ -109,11 +114,15 @@ public final class LightEconomyService implements EconomyService {
         if (acc == null) {
             return AccountDeletionResultTypes.ABSENT;
         }
-        final boolean success = this.storage.delete(acc);
-        if (!success) {
-            return AccountDeletionResultTypes.FAILED;
+        try {
+            if (this.storage.delete(acc)) {
+                return AccountDeletionResultTypes.SUCCESS;
+            }
+        } catch (Exception e) {
+            LELog.getLogger().error("Failed to deleted Account {} with {}", acc.getIdentifier(), identifier);
+            LELog.getLogger().error("Error", e);
         }
-        return AccountDeletionResultTypes.SUCCESS;
+        return AccountDeletionResultTypes.FAILED;
     }
 
     @Override
@@ -133,8 +142,9 @@ public final class LightEconomyService implements EconomyService {
         return this.storage;
     }
 
-    public void populate() {
-        for (Account account : this.storage.load()) {
+    public void populate() throws Exception {
+        final Collection<Account> accounts = this.storage.load();
+        for (Account account : accounts) {
             if (account instanceof LEUniqueAccount) {
                 this.uniqueAccountMap.put(((LEUniqueAccount) account).getUniqueId(), (LEUniqueAccount) account);
             } else if (account instanceof LEVirtualAccount) {
