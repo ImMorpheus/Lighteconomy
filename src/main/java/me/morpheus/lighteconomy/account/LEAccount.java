@@ -50,6 +50,10 @@ public class LEAccount implements Account {
         return this.displayName;
     }
 
+    public boolean hasDisplayName() {
+        return this.displayName != null;
+    }
+
     @Override
     public final BigDecimal getDefaultBalance(Currency currency) {
         return ((LECurrency) currency).getDefaultBalance();

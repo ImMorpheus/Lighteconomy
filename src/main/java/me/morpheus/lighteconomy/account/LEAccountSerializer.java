@@ -56,7 +56,9 @@ public final class LEAccountSerializer implements TypeSerializer<LEAccount> {
         if (obj == null) {
             return;
         }
-        value.getNode("displayName").setValue(TypeTokens.TEXT_TOKEN, obj.getDisplayName());
+        if (obj.hasDisplayName()) {
+            value.getNode("displayName").setValue(TypeTokens.TEXT_TOKEN, obj.getDisplayName());
+        }
         final Map<Currency, Double> balances = new IdentityHashMap<>();
         for (Map.Entry<Currency, BigDecimal> entry : obj.getBalances().entrySet()) {
             balances.put(entry.getKey(), entry.getValue().setScale(entry.getKey().getDefaultFractionDigits(), RoundingMode.HALF_UP).doubleValue());
