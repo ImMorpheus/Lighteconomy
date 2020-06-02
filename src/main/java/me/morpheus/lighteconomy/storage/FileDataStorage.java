@@ -1,6 +1,5 @@
 package me.morpheus.lighteconomy.storage;
 
-import me.morpheus.lighteconomy.LELog;
 import me.morpheus.lighteconomy.account.LEAccount;
 import me.morpheus.lighteconomy.util.LETypeTokens;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -71,11 +70,11 @@ public final class FileDataStorage implements DataStorageService {
             Files.createDirectories(directory);
         }
         final Path save = directory.resolve(account.getIdentifier() + ".conf");
-        final ConfigurationNode n = SimpleCommentedConfigurationNode.root().setValue(LETypeTokens.ACCOUNT_TOKEN, (LEAccount) account);
+        final ConfigurationNode node = SimpleCommentedConfigurationNode.root().setValue(LETypeTokens.ACCOUNT_TOKEN, (LEAccount) account);
         HoconConfigurationLoader.builder()
                 .setPath(save)
                 .build()
-                .save(n);
+                .save(node);
         ((LEAccount) account).setDirty(false);
     }
 

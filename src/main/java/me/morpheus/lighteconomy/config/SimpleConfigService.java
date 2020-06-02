@@ -55,13 +55,13 @@ public final class SimpleConfigService {
     }
 
     public void save() {
-        SimpleCommentedConfigurationNode n = SimpleCommentedConfigurationNode.root();
+        SimpleCommentedConfigurationNode node = SimpleCommentedConfigurationNode.root();
         try {
             if (Files.notExists(ConfigUtil.CONF)) {
                 Files.createFile(ConfigUtil.CONF);
             }
-            this.mapper.serialize(n);
-            this.loader.save(n);
+            this.mapper.serialize(node);
+            this.loader.save(node);
         } catch (Exception e) {
             throw new CompletionException(e);
         }

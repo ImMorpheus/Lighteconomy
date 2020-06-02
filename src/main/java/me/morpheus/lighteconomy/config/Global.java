@@ -2,15 +2,15 @@ package me.morpheus.lighteconomy.config;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 
-public class Global {
+public final class Global {
 
     @Setting(value = "balance-top-limit")
-    private int balanceTopLimit = 35;
+    private short balanceTopLimit = 35;
 
     @Setting(value = "enable-transaction-events")
     private boolean enableTransactionEvents = true;
 
-    public int getBalanceTopLimit() {
+    public short getBalanceTopLimit() {
         return this.balanceTopLimit;
     }
 

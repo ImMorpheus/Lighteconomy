@@ -104,12 +104,12 @@ public final class CurrencyLoader {
                     Files.createFile(save);
                 }
 
-                final ConfigurationNode n = SimpleCommentedConfigurationNode.root(options).setValue(LETypeTokens.CURRENCY_TOKEN, (LECurrency) currency);
+                final ConfigurationNode node = SimpleCommentedConfigurationNode.root(options).setValue(LETypeTokens.CURRENCY_TOKEN, (LECurrency) currency);
                 HoconConfigurationLoader.builder()
                         .setDefaultOptions(options)
                         .setPath(save)
                         .build()
-                        .save(n);
+                        .save(node);
             } catch (IOException | ObjectMappingException e) {
                 LELog.getLogger().error("Error while saving currency {} {}", currency.getClass(), currency.getId());
                 LELog.getLogger().error("Exception:", e);
