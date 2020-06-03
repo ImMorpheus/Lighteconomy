@@ -58,6 +58,7 @@ public class LightEconomy {
     public static final String VERSION = "0.0.1";
     public static final String DESCRIPTION = "A lightweighted economy service";
     private static final String PERM = LightEconomy.ID + "commands";
+    private boolean errored = false;
 
     @Inject public PluginContainer container;
 
@@ -72,6 +73,8 @@ public class LightEconomy {
         try {
             registerConfigService();
         } catch (IOException | ObjectMappingException e) {
+            Sponge.getServer().shutdown();
+            this.errored = true;
             LELog.getLogger().error("Config failed to load");
             LELog.getLogger().error("Error", e);
         }
@@ -79,18 +82,31 @@ public class LightEconomy {
 
     @Listener
     public void onInit(GameInitializationEvent event) {
+        if (this.errored) {
+            return;
+        }
         registerCommands();
         LELog.getLogger().info("Loading EconomyService");
-        initEconomyService();
+        try {
+            initEconomyService();
+        } catch (IllegalStateException e) {
+            Sponge.getServer().shutdown();
+            this.errored = true;
+        }
     }
 
     @Listener
     public void onPostInit(GamePostInitializationEvent event) {
+        if (this.errored) {
+            return;
+        }
         LELog.getLogger().info("Loading config");
         final EconomyService es = Sponge.getServiceManager().provideUnchecked(EconomyService.class);
         try {
             ((LightEconomyService) es).populate();
         } catch (Exception e) {
+            Sponge.getServer().shutdown();
+            this.errored = true;
             LELog.getLogger().error("Failed to populate the economy service");
             LELog.getLogger().error("Error", e);
         }
@@ -98,6 +114,9 @@ public class LightEconomy {
 
     @Listener
     public void onServerStopping(GameStoppingServerEvent event) {
+        if (this.errored) {
+            return;
+        }
         LELog.getLogger().info("Saving...");
         CurrencyLoader.getInstance().save();
         final LightEconomyService es = (LightEconomyService) Sponge.getServiceManager().provideUnchecked(EconomyService.class);
