@@ -47,7 +47,7 @@ final class AccountTests {
     }
 
     @Test
-    public void serializer() throws Exception {
+    void serializer() throws Exception {
         final LEAccountSerializer serializer = new LEAccountSerializer();
         final LEAccount expected = LEAccount.builder()
                 .identifier(DUMMY.toString())

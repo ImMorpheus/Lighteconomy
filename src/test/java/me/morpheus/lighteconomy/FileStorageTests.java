@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class FileStorageTests {
+final class FileStorageTests {
 
     private static final UUID DUMMY = UUID.fromString("00000000-0000-0000-0000-000000000000");
     private static final Path ROOT = Paths.get("tests");
@@ -41,7 +41,7 @@ public class FileStorageTests {
     }
 
     @Test
-    public void save() throws Exception {
+    void save() throws Exception {
         final LEAccount expected = LEAccount.builder()
                 .identifier(DUMMY.toString())
                 .uniqueId(DUMMY)
@@ -59,7 +59,7 @@ public class FileStorageTests {
     }
 
     @Test
-    public void delete() throws Exception {
+    void delete() throws Exception {
         final LEAccount expected = LEAccount.builder()
                 .identifier(DUMMY.toString())
                 .uniqueId(DUMMY)
