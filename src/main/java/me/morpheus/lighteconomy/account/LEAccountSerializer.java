@@ -34,11 +34,9 @@ public final class LEAccountSerializer implements TypeSerializer<LEAccount> {
         }
         final Map<Currency, Double> map = value.getNode("balances").getValue(LETypeTokens.MAP_CURRENCY_DOUBLE_TOKEN);
         if (map != null && !map.isEmpty()) {
-            final Map<Currency, BigDecimal> balances = new IdentityHashMap<>(map.size());
             for (Map.Entry<Currency, Double> entry : map.entrySet()){
                 builder.balance(entry.getKey(), BigDecimal.valueOf(entry.getValue()));
             }
-            builder.balances(balances);
         }
         final String identifier = value.getNode("identifier").getString();
         if (identifier == null) {
