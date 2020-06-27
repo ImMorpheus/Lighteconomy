@@ -32,7 +32,7 @@ public final class LECurrency implements Currency {
         this.displayName = builder.displayName;
         this.pluralDisplayName = builder.pluralDisplayName;
         this.symbol = builder.symbol;
-        this.maxBalance = builder.maxBalance == -1.0 ? null : BigDecimal.valueOf(builder.maxBalance);
+        this.maxBalance = builder.maxBalance < 0 ? null : BigDecimal.valueOf(builder.maxBalance);
         this.defaultBalance = BigDecimal.valueOf(builder.defaultBalance);
         this.defaultFractionDigits = builder.defaultFractionDigits;
         this.isDefault = builder.isDefault;
