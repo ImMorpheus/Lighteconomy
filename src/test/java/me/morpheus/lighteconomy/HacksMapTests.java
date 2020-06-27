@@ -2,115 +2,125 @@ package me.morpheus.lighteconomy;
 
 import me.morpheus.lighteconomy.util.hacks.Reference2ObjectOpenHacksMap;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 final class HacksMapTests {
 
     @DisplayName("merge empty")
-    @Test
-    void merge1() {
-        final Map<Object, Object> map = new Reference2ObjectOpenHacksMap<>();
+    @ParameterizedTest
+    @MethodSource("mapProvider")
+    void merge1(Reference2ObjectOpenHacksMap<Object, Object> custom, Map<Object, Object> map) {
         final Object key = new Object();
         final Object value = new Object();
         final Object remapped = new Object();
-        final Object result = map.merge(key, value, (o, v) -> remapped);
-        assertSame(value, result);
-        assertSame(value, map.get(key));
+        assertSame(map.merge(key, value, (o, v) -> remapped), custom.merge(key, value, (o, v) -> remapped));
+        assertSame(map.get(key), custom.get(key));
+        assertEquals(map, custom);
     }
 
     @DisplayName("merge null value")
-    @Test
-    void merge2() {
-        final Map<Object, Object> map = new Reference2ObjectOpenHacksMap<>();
+    @ParameterizedTest
+    @MethodSource("mapProvider")
+    void merge2(Reference2ObjectOpenHacksMap<Object, Object> custom, Map<Object, Object> map) {
         final Object key = new Object();
         map.put(key, null);
+        custom.put(key, null);
         final Object value = new Object();
         final Object remapped = new Object();
-        final Object result = map.merge(key, value, (o, v) -> remapped);
-        assertSame(value, result);
-        assertSame(value, map.get(key));
+        assertSame(map.merge(key, value, (o, v) -> remapped), custom.merge(key, value, (o, v) -> remapped));
+        assertSame(map.get(key), custom.get(key));
+        assertEquals(map, custom);
     }
 
     @DisplayName("merge old value")
-    @Test
-    void merge3() {
-        final Map<Object, Object> map = new Reference2ObjectOpenHacksMap<>();
+    @ParameterizedTest
+    @MethodSource("mapProvider")
+    void merge3(Reference2ObjectOpenHacksMap<Object, Object> custom, Map<Object, Object> map) {
         final Object key = new Object();
         final Object old = new Object();
         map.put(key, old);
+        custom.put(key, old);
         final Object value = new Object();
         final Object remapped = new Object();
-        final Object result = map.merge(key, value, (o, v) -> remapped);
-        assertSame(remapped, result);
-        assertSame(remapped, map.get(key));
+        assertSame(map.merge(key, value, (o, v) -> remapped), custom.merge(key, value, (o, v) -> remapped));
+        assertSame(map.get(key), custom.get(key));
+        assertEquals(map, custom);
     }
 
     @DisplayName("merge null function")
-    @Test
-    void merge4() {
-        final Map<Object, Object> map = new Reference2ObjectOpenHacksMap<>();
+    @ParameterizedTest
+    @MethodSource("mapProvider")
+    void merge4(Reference2ObjectOpenHacksMap<Object, Object> custom, Map<Object, Object> map) {
         final Object key = new Object();
         final Object old = new Object();
         map.put(key, old);
+        custom.put(key, old);
         final Object value = new Object();
-        final Object result = map.merge(key, value, (o, v) -> null);
-        assertNull(result);
-        assertTrue(map.isEmpty());
+        assertSame(map.merge(key, value, (o, v) -> null), custom.merge(key, value, (o, v) -> null));
+        assertEquals(map, custom);
     }
 
     @DisplayName("computeIfPresent empty")
-    @Test
-    void computeIfPresent1() {
-        final Map<Object, Object> map = new Reference2ObjectOpenHacksMap<>();
+    @ParameterizedTest
+    @MethodSource("mapProvider")
+    void computeIfPresent1(Reference2ObjectOpenHacksMap<Object, Object> custom, Map<Object, Object> map) {
         final Object key = new Object();
         final Object remapped = new Object();
-        final Object result = map.computeIfPresent(key, (k, o) -> remapped);
-        assertNull(result);
-        assertTrue(map.isEmpty());
+        assertSame(map.computeIfPresent(key, (k, o) -> remapped), custom.computeIfPresent(key, (k, o) -> remapped));
+        assertEquals(map, custom);
     }
 
     @DisplayName("computeIfPresent null value")
-    @Test
-    void computeIfPresent2() {
-        final Map<Object, Object> map = new Reference2ObjectOpenHacksMap<>();
+    @ParameterizedTest
+    @MethodSource("mapProvider")
+    void computeIfPresent2(Reference2ObjectOpenHacksMap<Object, Object> custom, Map<Object, Object> map) {
         final Object key = new Object();
         map.put(key, null);
+        custom.put(key, null);
         final Object remapped = new Object();
-        final Object result = map.computeIfPresent(key, (k, o) -> remapped);
-        assertNull(result);
-        assertNull(map.get(key));
-        assertEquals(1, map.size());
+        assertSame(map.computeIfPresent(key, (k, o) -> remapped), custom.computeIfPresent(key, (k, o) -> remapped));
+        assertSame(map.get(key), custom.get(key));
+        assertEquals(map, custom);
     }
 
     @DisplayName("computeIfPresent old value")
-    @Test
-    void computeIfPresent3() {
-        final Map<Object, Object> map = new Reference2ObjectOpenHacksMap<>();
+    @ParameterizedTest
+    @MethodSource("mapProvider")
+    void computeIfPresent3(Reference2ObjectOpenHacksMap<Object, Object> custom, Map<Object, Object> map) {
         final Object key = new Object();
         final Object value = new Object();
         map.put(key, value);
+        custom.put(key, value);
         final Object remapped = new Object();
-        final Object result = map.computeIfPresent(key, (k, o) -> remapped);
-        assertSame(remapped, result);
-        assertSame(remapped, map.get(key));
+        assertSame(map.computeIfPresent(key, (k, o) -> remapped), custom.computeIfPresent(key, (k, o) -> remapped));
+        assertSame(map.get(key), custom.get(key));
+        assertEquals(map, custom);
     }
 
     @DisplayName("merge null function")
-    @Test
-    void computeIfPresent4() {
-        final Map<Object, Object> map = new Reference2ObjectOpenHacksMap<>();
+    @ParameterizedTest
+    @MethodSource("mapProvider")
+    void computeIfPresent4(Reference2ObjectOpenHacksMap<Object, Object> custom, Map<Object, Object> map) {
         final Object key = new Object();
         final Object old = new Object();
         map.put(key, old);
-        final Object result = map.computeIfPresent(key, (k, o) -> null);
-        assertNull(result);
-        assertTrue(map.isEmpty());
+        custom.put(key, old);
+        assertSame(map.computeIfPresent(key, (k, o) -> null), custom.computeIfPresent(key, (k, o) -> null));
+        assertEquals(map, custom);
+    }
+
+    static Stream<Arguments> mapProvider() {
+        return Stream.of(
+                Arguments.arguments(new Reference2ObjectOpenHacksMap<>(), new HashMap<>())
+        );
     }
 }
