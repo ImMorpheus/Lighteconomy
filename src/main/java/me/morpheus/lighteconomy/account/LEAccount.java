@@ -315,8 +315,8 @@ public abstract class LEAccount implements Account {
     }
 
     public static LEAccount.AccountBuilder builder(int size) {
-        if (size == 0) {
-            throw new IllegalArgumentException("No");
+        if (size <= 0) {
+            throw new IllegalArgumentException("Expected a positive amount");
         }
         return new LEAccount.AccountBuilder(size);
     }
