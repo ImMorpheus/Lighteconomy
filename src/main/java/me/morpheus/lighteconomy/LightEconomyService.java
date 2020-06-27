@@ -16,6 +16,7 @@ import org.spongepowered.api.service.economy.account.VirtualAccount;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -55,7 +56,7 @@ public final class LightEconomyService implements EconomyService {
 
     @Override
     public Set<Currency> getCurrencies() {
-        return new HashSet<>(Sponge.getRegistry().getAllOf(Currency.class));
+        return Collections.unmodifiableSet(new HashSet<>(Sponge.getRegistry().getAllOf(Currency.class)));
     }
 
     @Override
