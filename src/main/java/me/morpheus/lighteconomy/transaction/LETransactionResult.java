@@ -25,6 +25,9 @@ public class LETransactionResult implements TransactionResult {
         Objects.requireNonNull(builder.account, "account is null");
         Objects.requireNonNull(builder.currency, "currency is null");
         Objects.requireNonNull(builder.amount, "amount is null");
+        if (builder.amount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Expected a positive amount");
+        }
         Objects.requireNonNull(builder.contexts, "contexts is null");
         Objects.requireNonNull(builder.resultType, "resultType is null");
         Objects.requireNonNull(builder.transactionType, "transactionType is null");
