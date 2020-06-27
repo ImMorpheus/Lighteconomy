@@ -25,7 +25,6 @@ public final class SimpleConfigService {
         try {
             this.mapper = ObjectMapper.forClass(Global.class).bindToNew();
         } catch (ObjectMappingException e) {
-            LELog.getLogger().error("Failed to populate configuration");
             throw new RuntimeException(e);
         }
     }
@@ -42,7 +41,7 @@ public final class SimpleConfigService {
             CommentedConfigurationNode node = this.loader.load();
             this.mapper.populate(node);
         } catch (Exception e) {
-            throw new CompletionException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -63,7 +62,7 @@ public final class SimpleConfigService {
             this.mapper.serialize(node);
             this.loader.save(node);
         } catch (Exception e) {
-            throw new CompletionException(e);
+            throw new RuntimeException(e);
         }
     }
 }
