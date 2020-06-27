@@ -100,7 +100,7 @@ public class LightEconomy {
         if (this.errored) {
             return;
         }
-        LELog.getLogger().info("Loading config");
+        LELog.getLogger().info("Populating EconomyService");
         final EconomyService es = Sponge.getServiceManager().provideUnchecked(EconomyService.class);
         try {
             ((LightEconomyService) es).populate();
