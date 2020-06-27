@@ -1,6 +1,5 @@
 package me.morpheus.lighteconomy.config;
 
-import me.morpheus.lighteconomy.LELog;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.commented.SimpleCommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
@@ -10,7 +9,6 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.concurrent.CompletionException;
 
 public final class SimpleConfigService {
 
