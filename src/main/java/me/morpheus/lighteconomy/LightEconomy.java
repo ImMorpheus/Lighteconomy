@@ -57,7 +57,7 @@ public class LightEconomy {
     public static final String NAME = "Lighteconomy";
     public static final String VERSION = "0.0.1";
     public static final String DESCRIPTION = "A lightweighted economy service";
-    private static final String PERM = LightEconomy.ID + "commands";
+    private static final String PERM = LightEconomy.ID + ".commands";
     private boolean errored = false;
 
     @Inject public PluginContainer container;
